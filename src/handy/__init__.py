@@ -81,10 +81,10 @@ class CaselessString(str):
   True
   >>> l=[bravo,alpha,charlie]
   >>> l
-  [CaselessString("'Bravo'"), CaselessString("'alpha'"), CaselessString("'charlie'")]
+  [CaselessString('Bravo'), CaselessString('alpha'), CaselessString('charlie')]
   >>> l.sort()
   >>> l
-  [CaselessString("'alpha'"), CaselessString("'Bravo'"), CaselessString("'charlie'")]
+  [CaselessString('alpha'), CaselessString('Bravo'), CaselessString('charlie')]
   """
 
   def __hash__(self):
@@ -121,7 +121,7 @@ class CaselessString(str):
     return NotImplemented
 
   def __repr__(self):
-    return '%s(%r)'%(self.__class__.__name__,super(self.__class__,self).__repr__())
+    return '%s(%s)'%(self.__class__.__name__,super(self.__class__,self).__repr__())
 
 class CaselessDict(dict):
   """Just like dict, but string keys are coerced to CaselessString
@@ -133,7 +133,7 @@ class CaselessDict(dict):
   <class '__main__.CaselessString'>
   >>> k.sort()
   >>> k
-  [CaselessString("'alpha'"), CaselessString("'Bravo'"), CaselessString("'charlie'")]
+  [CaselessString('alpha'), CaselessString('Bravo'), CaselessString('charlie')]
   >>> 'alpha' in x
   True
   >>> 'Alpha' in x
@@ -148,14 +148,14 @@ class CaselessDict(dict):
   <class '__main__.CaselessString'>
   >>> k.sort()
   >>> k
-  [CaselessString("'Delta'"), CaselessString("'echo'"), CaselessString("'FoxTrot'")]
+  [CaselessString('Delta'), CaselessString('echo'), CaselessString('FoxTrot')]
   >>> z=CaselessDict(dict(x))
   >>> k=list(z.keys())
   >>> type(k[0])
   <class '__main__.CaselessString'>
   >>> k.sort()
   >>> k
-  [CaselessString("'alpha'"), CaselessString("'Bravo'"), CaselessString("'charlie'")]
+  [CaselessString('alpha'), CaselessString('Bravo'), CaselessString('charlie')]
   >>> z.update(dict(y))
   >>> 'ALPHA' in z
   True
@@ -180,7 +180,7 @@ class CaselessDict(dict):
   >>> k=list(x.keys())
   >>> k.sort()
   >>> k
-  [CaselessString("'alpha'"), CaselessString("'Bravo'"), CaselessString("'charlie'")]
+  [CaselessString('alpha'), CaselessString('Bravo'), CaselessString('charlie')]
   >>> 'ALPHA' in x
   True
   >>> 'bravo' in x
