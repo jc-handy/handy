@@ -64,7 +64,7 @@ class AsciiString(str):
         return str.__new__(cls, val.translate(cls.utoa))
 
 
-class CaselessString(str):
+class CIString(str):
     """This is kind of a lawyerly class for strings. They have no case!
     :) This is just like str, but hashing and comparison ignore case."""
 
@@ -116,9 +116,11 @@ class CaselessString(str):
     def __hash__(self):
         return self._folded_hash
 
+# To support legacy code ...
+CaselessString=CIString
 
-class CaselessDict(dict):
-    """Just like dict, but string keys are coerced to CaselessString
+class CIDict(dict):
+    """Just like dict, but string keys are coerced to CIString
     values."""
 
     def __init__(self, *args, **kwargs):
@@ -126,19 +128,19 @@ class CaselessDict(dict):
         self.update(*args, **kwargs)
 
     def __setitem__(self, key, value):
-        if isinstance(key, str) and not isinstance(key, CaselessString):
-            super().__setitem__(CaselessString(key), value)
+        if isinstance(key, str) and not isinstance(key, CIString):
+            super().__setitem__(CIString(key), value)
         else:
             super().__setitem__(key, value)
 
     def __getitem__(self, key):
-        if isinstance(key, str) and not isinstance(key, CaselessString):
-            key = CaselessString(key)
+        if isinstance(key, str) and not isinstance(key, CIString):
+            key = CIString(key)
         return super().__getitem__(key)
 
     def __contains__(self, key):
-        if isinstance(key, str) and not isinstance(key, CaselessString):
-            key = CaselessString(key)
+        if isinstance(key, str) and not isinstance(key, CIString):
+            key = CIString(key)
         return super().__contains__(key)
 
     def get(self, key, default=None):
@@ -162,8 +164,8 @@ class CaselessDict(dict):
 
     def pop(self, key, default=None):
         try:
-            if isinstance(key, str) and not isinstance(key, CaselessString):
-                return super().pop(CaselessString(key))
+            if isinstance(key, str) and not isinstance(key, CIString):
+                return super().pop(CIString(key))
             return super().pop(key)
         except KeyError:
             if default is not None:
@@ -171,13 +173,13 @@ class CaselessDict(dict):
             raise
 
     def fromkeys(cls, iterable, value=None):
-        new_dict = CaselessDict()
+        new_dict = CIDict()
         for key in iterable:
             new_dict[key] = value
         return new_dict
 
     def copy(self):
-        return CaselessDict(super().copy())
+        return CIDict(super().copy())
 
     def __repr__(self):
         items = []
@@ -185,6 +187,8 @@ class CaselessDict(dict):
             items.append(f"{repr(key)}: {repr(value)}")
         return f"{self.__class__.__name__}({{{', '.join(items)}}})"
 
+# To support legacy code ...
+CaselessDict=CIDict
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
