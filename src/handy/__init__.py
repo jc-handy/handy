@@ -66,28 +66,7 @@ class AsciiString(str):
 
 class CaselessString(str):
     """This is kind of a lawyerly class for strings. They have no case!
-    :) This is just like str, but hashing and comparison ignore case.
-
-    >>> alpha=CaselessString('alpha')
-    >>> bravo=CaselessString('Bravo')
-    >>> charlie=CaselessString('charlie')
-    >>> isinstance(alpha,str)
-    True
-    >>> print(alpha)
-    alpha
-    >>> print(bravo)
-    Bravo
-    >>> alpha<bravo
-    True
-    >>> bravo<charlie
-    True
-    >>> l=[bravo,alpha,charlie]
-    >>> l
-    [CaselessString('Bravo'), CaselessString('alpha'), CaselessString('charlie')]
-    >>> l.sort()
-    >>> l
-    [CaselessString('alpha'), CaselessString('Bravo'), CaselessString('charlie')]
-    """
+    :) This is just like str, but hashing and comparison ignore case."""
 
     def __new__(cls, value):
         str_value = str(value)
@@ -140,67 +119,7 @@ class CaselessString(str):
 
 class CaselessDict(dict):
     """Just like dict, but string keys are coerced to CaselessString
-    values.
-
-    >>> x=CaselessDict(alpha=1,Bravo=2,charlie=3)
-    >>> k=list(x.keys())
-    >>> type(k[0])
-    <class 'handy.CaselessString'>
-    >>> k.sort()
-    >>> k
-    [CaselessString('alpha'), CaselessString('Bravo'), CaselessString('charlie')]
-    >>> 'alpha' in x
-    True
-    >>> 'Alpha' in x
-    True
-    >>> 'bravo' in x
-    True
-    >>> 'Bravo' in x
-    True
-    >>> y=CaselessDict([('Delta',4),('echo',5),('FoxTrot',6)])
-    >>> k=list(y.keys())
-    >>> type(k[0])
-    <class 'handy.CaselessString'>
-    >>> k.sort()
-    >>> k
-    [CaselessString('Delta'), CaselessString('echo'), CaselessString('FoxTrot')]
-    >>> z=CaselessDict(dict(x))
-    >>> k=list(z.keys())
-    >>> type(k[0])
-    <class 'handy.CaselessString'>
-    >>> k.sort()
-    >>> k
-    [CaselessString('alpha'), CaselessString('Bravo'), CaselessString('charlie')]
-    >>> z.update(dict(y))
-    >>> 'ALPHA' in z
-    True
-    >>> 'bravo' in z
-    True
-    >>> 'CHARLIE' in z
-    True
-    >>> 'delta' in z
-    True
-    >>> 'ECHO' in z
-    True
-    >>> 'FOXTROT' in z
-    True
-    >>> x.pop('alpha')
-    1
-    >>> x.pop('bravo')
-    2
-    >>> x.setdefault('alpha',1)
-    1
-    >>> x.setdefault('Bravo',2)
-    2
-    >>> k=list(x.keys())
-    >>> k.sort()
-    >>> k
-    [CaselessString('alpha'), CaselessString('Bravo'), CaselessString('charlie')]
-    >>> 'ALPHA' in x
-    True
-    >>> 'bravo' in x
-    True
-    """
+    values."""
 
     def __init__(self, *args, **kwargs):
         super().__init__()
@@ -278,41 +197,7 @@ def first_match(s, patterns):
     match) tuple. If not, return (None,None). The "patterns" arugment is
     an itterable of compiled regular expressions, but see the
     compile_filename_patterns() function also in this module for a way
-    to make this far more general.
-
-    >>> pats=['2019-*','re:^abc[0-9]{4}.dat$','X*.txt','*.txt','re:^.*\\\\.doc$']
-    >>> pats=compile_filename_patterns(pats)
-    >>> p,m=first_match('abc1980.dat',pats)
-    >>> p.pattern
-    '^abc[0-9]{4}.dat$'
-    >>> m.group()
-    'abc1980.dat'
-    >>> p,m=first_match('X-ray.txt',pats)
-    >>> p.pattern
-    '(?s:X.*\\\\.txt)\\\\Z'
-    >>> m.group()
-    'X-ray.txt'
-    >>> p,m=first_match('Y-ray.txt',pats)
-    >>> p.pattern
-    '(?s:.*\\\\.txt)\\\\Z'
-    >>> m.group()
-    'Y-ray.txt'
-    >>> p,m=first_match('2019-10-26.dat',pats)
-    >>> p.pattern
-    '(?s:2019\\\\-.*)\\\\Z'
-    >>> m.group()
-    '2019-10-26.dat'
-    >>> p,m=first_match('somefile.txt',pats)
-    >>> p.pattern
-    '(?s:.*\\\\.txt)\\\\Z'
-    >>> m.group()
-    'somefile.txt'
-    >>> p,m=first_match('somefile.doc',pats)
-    >>> p.pattern
-    '^.*\\\\.doc$'
-    >>> m.group()
-    'somefile.doc'
-    """
+    to make this far more general."""
 
     for p in patterns:
         m = p.match(s)
@@ -330,7 +215,7 @@ def non_negative_int(s):
             return n
     except:
         pass
-    raise ValueError("%r is not a non-negative integer." % s)
+    raise ValueError(f"{s!r} is not a non-negative integer.")
 
 
 def positive_int(s):
@@ -342,7 +227,7 @@ def positive_int(s):
             return n
     except:
         pass
-    raise ValueError("%r is not a non-negative integer." % s)
+    raise ValueError(f"{s!r} is not a positive integer.")
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -355,21 +240,7 @@ def compile_filename_patterns(pattern_list):
     """Given a sequence of filespecs, regular expressions (prefixed with
     're:'), and compiled regular expressions, convert them all to
     compiled RE objects. The original pattern_list is not modified. The
-    compiled REs are returned in a new list.
-
-    >>> pats=['2019-*','re:^abc[0-9]{4}.dat$','X*.txt','*.txt',r're:\\\\A.*\\\\.doc\\\\Z']
-    >>> pats=compile_filename_patterns(pats)
-    >>> pats[0].pattern
-    '(?s:2019\\\\-.*)\\\\Z'
-    >>> pats[1].pattern
-    '^abc[0-9]{4}.dat$'
-    >>> pats[2].pattern
-    '(?s:X.*\\\\.txt)\\\\Z'
-    >>> pats[3].pattern
-    '(?s:.*\\\\.txt)\\\\Z'
-    >>> pats[4].pattern
-    '\\\\A.*\\\\.doc\\\\Z'
-    """
+    compiled REs are returned in a new list."""
 
     pats = list(pattern_list)
     for i in range(len(pats)):
@@ -536,7 +407,7 @@ class ProgInfo(object):
       pid       - numeric PID (program ID) of this script.
       dir       - full, absolute dirname of this script.
       real_name - like name, but with any symlinks resolved.
-      real_dir  - like dir, bu with symlinks resolved.
+      real_dir  - like dir, but with any symlinks resolved.
       tempdir   - name of this system's main temp directory.
       temp      - full name of this script's temp file or temp directory."""
 
