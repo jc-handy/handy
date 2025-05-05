@@ -63,168 +63,205 @@ class AsciiString(str):
     return str.__new__(cls,val.translate(cls.utoa))
 
 class CaselessString(str):
-  """This is kind of a lawyerly class for strings. They have no case! :)
-  This is just like str, but hashing and comparison ignore case.
+    """This is kind of a lawyerly class for strings. They have no case! :)
+    This is just like str, but hashing and comparison ignore case.
 
-  >>> alpha=CaselessString('alpha')
-  >>> bravo=CaselessString('Bravo')
-  >>> charlie=CaselessString('charlie')
-  >>> isinstance(alpha,str)
-  True
-  >>> print(alpha)
-  alpha
-  >>> print(bravo)
-  Bravo
-  >>> alpha<bravo
-  True
-  >>> bravo<charlie
-  True
-  >>> l=[bravo,alpha,charlie]
-  >>> l
-  [CaselessString('Bravo'), CaselessString('alpha'), CaselessString('charlie')]
-  >>> l.sort()
-  >>> l
-  [CaselessString('alpha'), CaselessString('Bravo'), CaselessString('charlie')]
-  """
+    >>> alpha=CaselessString('alpha')
+    >>> bravo=CaselessString('Bravo')
+    >>> charlie=CaselessString('charlie')
+    >>> isinstance(alpha,str)
+    True
+    >>> print(alpha)
+    alpha
+    >>> print(bravo)
+    Bravo
+    >>> alpha<bravo
+    True
+    >>> bravo<charlie
+    True
+    >>> l=[bravo,alpha,charlie]
+    >>> l
+    [CaselessString('Bravo'), CaselessString('alpha'), CaselessString('charlie')]
+    >>> l.sort()
+    >>> l
+    [CaselessString('alpha'), CaselessString('Bravo'), CaselessString('charlie')]
+    """
 
-  def __hash__(self):
-    return hash(self.lower())
+    def __new__(cls, value):
+        str_value=str(value)
+        instance=super().__new__(cls, str_value)
+        instance._folded_hash=hash(str_value.casefold())
+        return instance
 
-  def __lt__(self,other):
-    if isinstance(other,str):
-      return self.lower()<other.lower()
-    return NotImplemented
+    def __repr__(self):
+        return f"{self.__class__.__name__}({super().__repr__()})"
 
-  def __le__(self,other):
-    if isinstance(other,str):
-      return self.lower()<=other.lower()
-    return NotImplemented
+    def __eq__(self, other):
+        folded_self=self.casefold()
+        if isinstance(other, str):
+            return folded_self == other.casefold()
+        return NotImplemented
 
-  def __eq__(self,other):
-    if isinstance(other,str):
-      return self.lower()==other.lower()
-    return NotImplemented
+    def __ne__(self, other):
+        result=self.__eq__(other)
+        if result is NotImplemented:
+            return NotImplemented
+        return not result
 
-  def __ne__(self,other):
-    if isinstance(other,str):
-      return self.lower()!=other.lower()
-    return NotImplemented
+    def __lt__(self, other):
+        folded_self=self.casefold()
+        if isinstance(other, str):
+            return folded_self < other.casefold()
+        return NotImplemented
 
-  def __ge__(self,other):
-    if isinstance(other,str):
-      return self.lower()>=other.lower()
-    return NotImplemented
+    def __le__(self, other):
+        folded_self=self.casefold()
+        if isinstance(other, str):
+            return folded_self <= other.casefold()
+        return NotImplemented
 
-  def __gt__(self,other):
-    if isinstance(other,str):
-      return self.lower()>other.lower()
-    return NotImplemented
+    def __gt__(self, other):
+        folded_self=self.casefold()
+        if isinstance(other, str):
+            return folded_self > other.casefold()
+        return NotImplemented
 
-  def __repr__(self):
-    return '%s(%s)'%(self.__class__.__name__,super(self.__class__,self).__repr__())
+    def __ge__(self, other):
+        folded_self=self.casefold()
+        if isinstance(other, str):
+            return folded_self >= other.casefold()
+        return NotImplemented
+
+    def __hash__(self):
+        return self._folded_hash
 
 class CaselessDict(dict):
-  """Just like dict, but string keys are coerced to CaselessString
-  values.
+    """Just like dict, but string keys are coerced to CaselessString
+    values.
 
-  >>> x=CaselessDict(alpha=1,Bravo=2,charlie=3)
-  >>> k=list(x.keys())
-  >>> type(k[0])
-  <class '__main__.CaselessString'>
-  >>> k.sort()
-  >>> k
-  [CaselessString('alpha'), CaselessString('Bravo'), CaselessString('charlie')]
-  >>> 'alpha' in x
-  True
-  >>> 'Alpha' in x
-  True
-  >>> 'bravo' in x
-  True
-  >>> 'Bravo' in x
-  True
-  >>> y=CaselessDict([('Delta',4),('echo',5),('FoxTrot',6)])
-  >>> k=list(y.keys())
-  >>> type(k[0])
-  <class '__main__.CaselessString'>
-  >>> k.sort()
-  >>> k
-  [CaselessString('Delta'), CaselessString('echo'), CaselessString('FoxTrot')]
-  >>> z=CaselessDict(dict(x))
-  >>> k=list(z.keys())
-  >>> type(k[0])
-  <class '__main__.CaselessString'>
-  >>> k.sort()
-  >>> k
-  [CaselessString('alpha'), CaselessString('Bravo'), CaselessString('charlie')]
-  >>> z.update(dict(y))
-  >>> 'ALPHA' in z
-  True
-  >>> 'bravo' in z
-  True
-  >>> 'CHARLIE' in z
-  True
-  >>> 'delta' in z
-  True
-  >>> 'ECHO' in z
-  True
-  >>> 'FOXTROT' in z
-  True
-  >>> x.pop('alpha')
-  1
-  >>> x.pop('bravo')
-  2
-  >>> x.setdefault('alpha',1)
-  1
-  >>> x.setdefault('Bravo',2)
-  2
-  >>> k=list(x.keys())
-  >>> k.sort()
-  >>> k
-  [CaselessString('alpha'), CaselessString('Bravo'), CaselessString('charlie')]
-  >>> 'ALPHA' in x
-  True
-  >>> 'bravo' in x
-  True
+    >>> x=CaselessDict(alpha=1,Bravo=2,charlie=3)
+    >>> k=list(x.keys())
+    >>> type(k[0])
+    <class 'handy.CaselessString'>
+    >>> k.sort()
+    >>> k
+    [CaselessString('alpha'), CaselessString('Bravo'), CaselessString('charlie')]
+    >>> 'alpha' in x
+    True
+    >>> 'Alpha' in x
+    True
+    >>> 'bravo' in x
+    True
+    >>> 'Bravo' in x
+    True
+    >>> y=CaselessDict([('Delta',4),('echo',5),('FoxTrot',6)])
+    >>> k=list(y.keys())
+    >>> type(k[0])
+    <class 'handy.CaselessString'>
+    >>> k.sort()
+    >>> k
+    [CaselessString('Delta'), CaselessString('echo'), CaselessString('FoxTrot')]
+    >>> z=CaselessDict(dict(x))
+    >>> k=list(z.keys())
+    >>> type(k[0])
+    <class 'handy.CaselessString'>
+    >>> k.sort()
+    >>> k
+    [CaselessString('alpha'), CaselessString('Bravo'), CaselessString('charlie')]
+    >>> z.update(dict(y))
+    >>> 'ALPHA' in z
+    True
+    >>> 'bravo' in z
+    True
+    >>> 'CHARLIE' in z
+    True
+    >>> 'delta' in z
+    True
+    >>> 'ECHO' in z
+    True
+    >>> 'FOXTROT' in z
+    True
+    >>> x.pop('alpha')
+    1
+    >>> x.pop('bravo')
+    2
+    >>> x.setdefault('alpha',1)
+    1
+    >>> x.setdefault('Bravo',2)
+    2
+    >>> k=list(x.keys())
+    >>> k.sort()
+    >>> k
+    [CaselessString('alpha'), CaselessString('Bravo'), CaselessString('charlie')]
+    >>> 'ALPHA' in x
+    True
+    >>> 'bravo' in x
+    True
+    """
 
-  """
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        self.update(*args, **kwargs)
 
-  def __init__(self,obj=None,**kwargs):
-    "Make sure all string keys go in as CaselessString values."
+    def __setitem__(self, key, value):
+        if isinstance(key, str) and not isinstance(key, CaselessString):
+            super().__setitem__(CaselessString(key), value)
+        else:
+            super().__setitem__(key, value)
 
-    if isinstance(obj,(list,tuple)):
-      # This had better be a sequence of pairs.
-      for k,v in obj:
-        self[k]=type(v)(v)
-    elif obj is not None:
-      # Treat obj as a generic mapping object (which might not be a dict).
-      for k in obj:
-        self[k]=type(obj[k])(obj[k])
-    for k,v in kwargs.items():
-      self[k]=type(v)(v)
+    def __getitem__(self, key):
+        if isinstance(key, str) and not isinstance(key, CaselessString):
+            key = CaselessString(key)
+        return super().__getitem__(key)
 
-  def __contains__(self,k):
-    "Make sure hash comparisons are done on CaselessString values."
+    def __contains__(self, key):
+        if isinstance(key, str) and not isinstance(key, CaselessString):
+            key = CaselessString(key)
+        return super().__contains__(key)
 
-    if type(k)!=CaselessString and isinstance(k,str):
-      k=CaselessString(k)
-    return super(CaselessDict,self).__contains__(k)
+    def get(self, key, default=None):
+        try:
+            return self.__getitem__(key)
+        except KeyError:
+            return default
 
-  def __getitem__(self,k):
-    if type(k)!=CaselessString and isinstance(k,str):
-      k=CaselessString(k)
-    return super(CaselessDict,self).__getitem__(k)
+    def setdefault(self, key, default=None):
+        if key not in self:
+            self[key] = default
+        return self[key]
 
-  def __setitem__(self,k,val):
-    "Make sure all stringish keys are put in as CaselessStrings."
+    def update(self, *args, **kwargs):
+        if args:
+            other = dict(args[0])
+            for k, v in other.items():
+                self[k] = v
+        for k, v in kwargs.items():
+            self[k] = v
 
-    if type(k)!=CaselessString and isinstance(k,str):
-      k=CaselessString(k)
-    super(CaselessDict,self).__setitem__(k,val)
+    def pop(self, key, default=None):
+        try:
+            if isinstance(key, str) and not isinstance(key, CaselessString):
+                return super().pop(CaselessString(key))
+            return super().pop(key)
+        except KeyError:
+            if default is not None:
+                return default
+            raise
 
-  def setdefault(self,k,default=None):
-    if k not in self:
-      self[k]=default
-    return self[k]
+    def fromkeys(cls, iterable, value=None):
+        new_dict = CaselessDict()
+        for key in iterable:
+            new_dict[key] = value
+        return new_dict
+
+    def copy(self):
+        return CaselessDict(super().copy())
+
+    def __repr__(self):
+        items = []
+        for key, value in self.items():
+            items.append(f"{repr(key)}: {repr(value)}")
+        return f"{self.__class__.__name__}({{{', '.join(items)}}})"
 
  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -238,7 +275,7 @@ def first_match(s,patterns):
   compile_filename_patterns() function also in this module for a way to
   make this far more general.
 
-  >>> pats=['2019-*','re:^abc[0-9]{4}.dat$','X*.txt','*.txt',r're:^.*\.doc$']
+  >>> pats=['2019-*','re:^abc[0-9]{4}.dat$','X*.txt','*.txt','re:^.*\\\\.doc$']
   >>> pats=compile_filename_patterns(pats)
   >>> p,m=first_match('abc1980.dat',pats)
   >>> p.pattern
@@ -311,7 +348,7 @@ def compile_filename_patterns(pattern_list):
   RE objects. The original pattern_list is not modified. The compiled
   REs are returned in a new list.
 
-  >>> pats=['2019-*','re:^abc[0-9]{4}.dat$','X*.txt','*.txt',r're:\A.*\.doc\Z']
+  >>> pats=['2019-*','re:^abc[0-9]{4}.dat$','X*.txt','*.txt',r're:\\\\A.*\\\\.doc\\\\Z']
   >>> pats=compile_filename_patterns(pats)
   >>> pats[0].pattern
   '(?s:2019\\\\-.*)\\\\Z'
@@ -651,7 +688,7 @@ class Spinner(object):
 
   Each next element of the given sequence is returned every time the
   instance is called, which repeats forever. The default sequence is
-  r'-\|/', which are the traditional ASCII spinner characters. Try this:
+  '-\\|/', which are the traditional ASCII spinner characters. Try this:
 
     import sys,time
     from handy import Spinner
