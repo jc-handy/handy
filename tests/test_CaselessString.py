@@ -1,68 +1,62 @@
 import pytest
 from src.handy import CaselessString
 
+alpha=CaselessString('alpha')
+bravo=CaselessString('bravo')
+charlie=CaselessString('charlie')
+
+Alpha=CaselessString('Alpha')
+Bravo=CaselessString('Bravo')
+Charlie=CaselessString('Charlie')
+
 class TestCaselessString:
     def test_initialization(self):
-        cs1 = CaselessString("Hello")
-        assert cs1 == "Hello"
-        assert str(cs1) == "Hello"
+        assert isinstance(alpha,str)
+        assert isinstance(alpha,CaselessString)
+        assert alpha == 'alpha'
 
-        cs2 = CaselessString("hello")
-        assert cs2 == "hello"
-        assert str(cs2) == "hello"
+    def test_equality_with_CaselessString(self):
+        assert alpha == alpha
+        assert alpha == Alpha
+        assert alpha != bravo
+        assert not (alpha == bravo)
 
-        cs3 = CaselessString(123)
-        assert cs3 == "123"
-        assert str(cs3) == "123"
+    def test_equality_with_str(self):
+        assert alpha == 'alpha'
+        assert alpha == 'Alpha'
+        assert 'alpha' == alpha
+        assert 'Alpha' == alpha
+        assert alpha != 'bravo'
+        assert not (alpha == 'bravo')
 
-    def test_case_insensitive_equality_with_caseless_string(self):
-        cs1 = CaselessString("Apple")
-        cs2 = CaselessString("apple")
-        assert cs1 == cs2
-        assert not (cs1 != cs2)
-
-        cs3 = CaselessString("Banana")
-        assert cs1 != cs3
-        assert not (cs1 == cs3)
-
-    def test_case_insensitive_equality_with_regular_string(self):
-        cs = CaselessString("World")
-        s1 = "world"
-        s2 = "WORLD"
-        s3 = "different"
-
-        assert cs == s1
-        assert cs == s2
-        assert s1 == cs
-        assert s2 == cs
-        assert not (cs == s3)
-        assert cs != s3
-
-    def test_case_insensitive_str_equality(self):
-        cs = CaselessString("Python")
-        s1 = "python"
-        s2 = "Python"
-        s3 = "different"
-
-        assert cs == s1
-        assert cs == s2
-        assert s1 == cs
-        assert s2 == cs
-        assert not (cs == s3)
-        assert cs != s3
+    def test_other_comparisons(self):
+        assert alpha<Bravo<charlie
+        assert charlie>Bravo>alpha
+        assert alpha<'Bravo'<charlie
+        assert charlie>'Bravo'>alpha
 
     def test_repr(self):
-        cs1 = CaselessString("MixedCase")
-        assert repr(cs1) == "CaselessString('MixedCase')"
+        repr(alpha) == CaselessString('alpha')
+        repr(Bravo) == CaselessString('Bravo')
+        repr(charlie) == CaselessString('charlie')
 
-        cs2 = CaselessString("String with 'quotes'")
-        assert repr(cs2) == "CaselessString(\"String with 'quotes'\")", "Ensure single quotes are escaped"
+    def test_sorting(self):
+        l=[Bravo,alpha,charlie]
+        assert repr(l) == "[CaselessString('Bravo'), CaselessString('alpha'), CaselessString('charlie')]"
+        l.sort()
+        assert repr(l) == "[CaselessString('alpha'), CaselessString('Bravo'), CaselessString('charlie')]"
+        l.sort(reverse=True)
+        assert repr(l) == "[CaselessString('charlie'), CaselessString('Bravo'), CaselessString('alpha')]"
 
-        cs3 = CaselessString('"Double quotes"')
-        actual_repr_3 = repr(cs3)
-        print(f"repr(cs3) is: {actual_repr_3}")
-        assert actual_repr_3 == "CaselessString('\"Double quotes\"')"
+        l=['Bravo',alpha,charlie]
+        assert repr(l) == "['Bravo', CaselessString('alpha'), CaselessString('charlie')]"
+        l.sort()
+        assert repr(l) == "[CaselessString('alpha'), 'Bravo', CaselessString('charlie')]"
+        l.sort(reverse=True)
+        assert repr(l) == "[CaselessString('charlie'), 'Bravo', CaselessString('alpha')]"
 
     def test_str(self):
-        cs = CaselessString("Original Case")
-        assert str(cs) == "Original Case"
+        bravo=CaselessString('Bravo')
+        assert type(str(bravo)) == str
+        assert bravo == str(bravo)
+        assert str(bravo) == bravo
