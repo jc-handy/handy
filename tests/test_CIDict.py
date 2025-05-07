@@ -1,5 +1,5 @@
 import pytest
-from src.handy import CIDict
+from src.handy import CIDict,CIString
 
 d=CIDict(
     alpha=1,
@@ -34,6 +34,8 @@ class Test_CIDict:
         d['gamma'] = 5
         assert d['gamma'] == 5
         assert d['GaMmA'] == 5
+        assert d[CIString('gamma')] == 5
+        assert d[CIString('GaMmA')] == 5
 
         d[10] = "int key"
         assert d[10] == "int key"
@@ -51,6 +53,8 @@ class Test_CIDict:
     def test_get(self):
         assert d.get('alpha') == 1
         assert d.get('AlPhA') == 1
+        assert d.get(CIString('alpha')) == 1
+        assert d.get(CIString('AlPhA')) == 1
         assert d.get('missing') is None
         assert d.get('missing', -1) == -1
 

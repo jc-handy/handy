@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jc-handy-helpers"
-version = "0.1.3"  # Consider using a proper versioning scheme
+version = "0.1.4"  # Consider using a proper versioning scheme
 authors = [
   { name="Jeff Clough", email="jeff@cloughcottage.com" },
 ]
