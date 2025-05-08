@@ -4,6 +4,7 @@ from src.handy import first_match, compile_filename_patterns
 from src.handy import non_negative_int, positive_int
 from src.handy import shellify
 from src.handy import ProgInfo,prog
+from src.handy import get_module_versions
 
 class Test_file_pattern_stuff:
     def test_file_pattern_stuff(self):
@@ -86,7 +87,7 @@ class Test_ProgInfo:
         ###
         ### Run `pytest -s` to see the output printed below.
         ###
-        print("\n------------------------------")
+        print("\n---- ProgInfo ----------------")
         print(f"{prog.name=}")
         print(f"{prog.pid=}")
         print(f"{prog.dir=}")
@@ -94,6 +95,18 @@ class Test_ProgInfo:
         print(f"{prog.real_dir=}")
         print(f"{prog.tempdir=}")
         print(f"{prog.temp=}")
+        print("------------------------------")
+
+class Test_get_module_versions:
+    def test_get_module_versions(self):
+        ###
+        ### Run `pytest -s` to see the output printed below.
+        ###
+        print("\n---- get_module_versions() ---")
+        mv=get_module_versions()
+        print(mv.pop(0))
+        while mv:
+            print(' ',mv.pop(0))
         print("------------------------------")
 
 class Test_docstring_tests:

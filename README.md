@@ -214,6 +214,25 @@ If "prompt" is some true value, write that string to standard output
 before getting the input character, and then after the input, write
 a newline character to standard output.
 
+#### get_module_versions()
+Return a list of ModuleVersion instances starting with the main
+program module, followed by the sorted-by-name imported modules that
+are not part of Python's standard library.
+
+The main module can print its own version like this:
+
+    print(get_module_versions()[0])
+
+Or it can include the versions of its non-standard dependencies like
+this:
+
+    mv=get_module_versions()
+    print(mv.pop(0))
+    while mv:
+        print(' ',mv.pop(0))
+
+See the ModuleVersion dataclass for more information.
+
 #### gripe(msg, output=<\_io.TextIOWrapper name='<stderr>' mode='w' encoding='utf-8'>, progname='docmd')
 Same as die(...,rc=None), so the program doesn't terminate.
 

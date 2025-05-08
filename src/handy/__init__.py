@@ -1,4 +1,8 @@
-import fnmatch, os, re, shlex, sys, termios
+import fnmatch, os, re, shlex, sys, termios, typing
+from dataclasses import dataclass
+from importlib.metadata import packages_distributions, version, PackageNotFoundError
+from importlib.util import find_spec
+from pprint import pprint
 
 from .AsciiString import AsciiString
 from .CIString import CIString
@@ -19,6 +23,7 @@ __all__=[
     'AsciiString',
     'CIDict','CaselessDict',
     'CIString','CaselessString',
+    'ModuleVersion','get_module_versions',
     'ProgInfo','prog',
     'Spinner','cylon_spinner','wheel_spinner',
     'compile_filename_patterns',
@@ -295,3 +300,106 @@ def rmdirs(path):
             # print "os.remove(%r)"%(f,)
             os.remove(f)
 
+@dataclass
+class ModuleVersion:
+    """
+    Instances of this dataclass have three attributes:
+
+      name:    The name of the imported module.
+      dist:    The name of the package installed via pip.
+      version: The version string from the module's metadata.
+
+    You shouldn't need to instantiate this dataclass yourself, but it
+    would look like this:
+
+        module=ModuleVersion(
+            'module_name',
+            'distributed_package_name_if_different',
+            'version_string_of_this_module
+        )
+
+    The `dist` attrubute will be `None` if the module is distrubuted
+    under the same name as the imported module.
+
+    This dataclass also contains two format strings:
+
+      fmt:      Format string for just `name` and `version` values.
+      fmt_dist: Also includes formatting for the `dist` value.
+
+    Update these format strings at both your pleasure and peril.
+
+    See the get_module_versions() function for more information.
+    """
+
+    fmt: typing.ClassVar[str]="{name}: {version}"
+    fmt_dest: typing.ClassVar[str]="{name} (from {dist}): {version}"
+
+    name: str
+    dist: str
+    version: str
+
+    def __str__(self):
+        if self.dist:
+            return ModuleVersion.fmt_dest.format(**self.__dict__)
+        else:
+            return ModuleVersion.fmt.format(**self.__dict__)
+
+def get_module_versions():
+    """
+    Return a list of ModuleVersion instances starting with the main
+    program module, followed by the sorted-by-name imported modules that
+    are not part of Python's standard library.
+
+    The main module can print its own version like this:
+
+        print(get_module_versions()[0])
+
+    Or it can include the versions of its non-standard dependencies like
+    this:
+
+        mv=get_module_versions()
+        print(mv.pop(0))
+        while mv:
+            print(' ',mv.pop(0))
+
+    See the ModuleVersion dataclass for more information.
+    """
+
+    # Get a dictionary of imported, non-standard modules.
+    std_mod_path=os.path.dirname(os.__file__)
+    imported={}
+    for m in sorted(sys.modules.keys()):
+        if m=='__main__' or '.' in m or m[0]=='_':
+            continue
+        spec=find_spec(m)
+        if spec.origin is None or spec.origin=='built-in' or std_mod_path in spec.origin:
+            continue
+        imported[m]=ModuleVersion(m,None,None)
+
+    # Get version strings for these modules.
+    pd=packages_distributions()
+    # Iterate on a distinct list of keys because we modify the dictionary
+    # we're iterating through.
+    for m in list(imported.keys()):
+        try:
+            imported[m].version=version(m)
+        except PackageNotFoundError as e:
+            if m in pd:
+                dist=pd[m][0]
+                try:
+                    imported[m].dist=dist
+                    imported[m].version=version(dist)
+                except PackageNotFoundError as e:
+                    del imported[m]
+            else:
+                del imported[m]
+
+    # Return a list of ModuleVersion instances beginning with our main program
+    # module and continuing with a sorted list of imported, non-standard
+    # modules.
+    if prog.name in imported:
+        response=[imported.pop(prog.name)]
+    else:
+        response=[ModuleVersion(prog.name,None,'UNKNOWN')]
+    response.extend(sorted(imported.values(),key=lambda m:m.name))
+    return response
