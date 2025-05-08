@@ -221,15 +221,23 @@ are not part of Python's standard library.
 
 The main module can print its own version like this:
 
-    print(get_module_versions()[0])
+```python
+from handy import get_module_versions
+
+print(get_module_versions()[0])
+```
 
 Or it can include the versions of its non-standard dependencies like
 this:
 
-    mv=get_module_versions()
-    print(mv.pop(0))
-    while mv:
-        print(' ',mv.pop(0))
+```python
+from handy import get_module_versions
+
+mv=get_module_versions()
+print(mv.pop(0))
+while mv:
+    print(' ',mv.pop(0))
+```
 
 See the ModuleVersion dataclass for more information.
 
